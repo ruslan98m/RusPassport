@@ -1,16 +1,16 @@
 '''
 PassportEye: Python tools for image processing of identification documents
 
-Author: Konstantin Tretyakov
+Author: Alexand Dziuba
 License: MIT
 '''
 import sys
 from setuptools import setup, find_packages
 
 
-setup(name='PassportEye',
+setup(name='RusPasport',
       version=[ln for ln in open("passporteye/__init__.py") if ln.startswith("__version__")][0].split('"')[1],
-      description="Extraction of machine-readable zone information from passports, visas and id-cards via OCR",
+      description="Extraction information from russian passports",
       long_description=open("README.rst").read(),
       classifiers=[ # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
           'Development Status :: 4 - Beta',
@@ -23,21 +23,13 @@ setup(name='PassportEye',
           'Intended Audience :: Financial and Insurance Industry'
       ],
       keywords='id-card passport image-processing mrz machine-readable-zone',
-      author='Konstantin Tretyakov',
-      author_email='kt@ut.ee',
-      url='https://github.com/konstantint/PassportEye',
+      author='Dziuba Alexandr',
+      author_email='dziuba.ai@students.dvfu.ru',
+      url='https://github.com/Ruslan2288/RusPasport',
       license='MIT',
-      packages=find_packages(exclude=['examples', 'tests']),
+      packages=find_packages(exclude=['tests']),
       include_package_data=True,
       zip_safe=False,
-      install_requires=['numpy', 'scipy', 'scikit-image >= 0.14.1', 'imageio', 'scikit-learn', 'matplotlib', 'pytesseract >= 0.2.0', 'imageio',
-                        'pdfminer >= 20191010'],
-      extras_require={
-          "test": ["pytest"],
-          "dev": ["pytest", "pylint", "jupyter", "twine"],
-      },
-      entry_points={
-          'console_scripts': ['evaluate_mrz=passporteye.mrz.scripts:evaluate_mrz',
-                              'mrz=passporteye.mrz.scripts:mrz']
-      }
+      install_requires=['numpy','cv2', 'pytesseract >= 0.2.0'],
+      
      )

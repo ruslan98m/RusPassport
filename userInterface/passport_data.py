@@ -1,5 +1,10 @@
-class passport_data():
-   def __init__():
+
+
+
+
+class PassportData():
+
+   def __init__(self):
         self.placeBirth = None
         self.male = None
 
@@ -13,8 +18,10 @@ class passport_data():
         self.code = None
 
         #data
-        self.serial = None
-        self.number = None
+        self.serial1 = None
+        self.serial2 = None
+        self.number1 = None
+        self.number2 = None
 
         #
         self.date_1 = None

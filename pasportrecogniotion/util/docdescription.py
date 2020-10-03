@@ -46,19 +46,11 @@ class DataBlock():
             self.data.append("".join(filter(lambda x: x in self.whitelist, res[0:-2])))
             if __debug__:
                 print(self.data[-1])
-                if len(res) > 0:
-                    cv2.resizeWindow("def", 1, 1)
-                    cv2.imshow("def", ROI)
-                    cv2.waitKey(0)
         else:
             res = ocreng(ROI, 'eng')
             self.mrz.append("".join(filter(lambda x: x in self.whitelist, res[0:-2])))
             if __debug__:
                 print(self.mrz[-1])
-                if len(res)>0:
-                    cv2.resizeWindow("def", 1, 1)
-                    cv2.imshow("def", ROI)
-                    cv2.waitKey(0)
 
 
 class DocDescription(object):
@@ -83,28 +75,14 @@ class DocDescription(object):
         for key in self.blocks:
             block = self.blocks[key]
             for i, c in enumerate(rects):
-                box = RotatedBox(c[0], c[1][0], c[1][1], 0)
-                if box.area > 50 / iws / ihs:
-                    if ((box.cy / ihs > block.posY) and (
-                            box.cy / ihs < block.posY + block.height) and
-                            (box.cx / iws > block.posX) and (
-                                    box.cx / iws < block.posX + block.width)):
+                if c[1][1]*c[1][0] > 50 / iws / ihs:
+                    if ((c[0][1] / ihs > block.posY) and (
+                            c[0][1] / ihs < block.posY + block.height) and
+                            (c[0][0] / iws > block.posX) and (
+                                    c[0][0] / iws < block.posX + block.width)):
                         box = cv2.boxPoints(c)  # cv2.boxPoints(rect) for OpenCV 3.x
                         box = np.int0(box)
                         block.images.append(box)
-
-            if __debug__:
-                blank_img = img.copy()
-                cv2.drawContours(blank_img, block.images, -1, (0, 0, 255), 2)
-
-                start_point = (int((block.posX) * iws), int((block.posY) * ihs))
-                end_point = (
-                    int((block.posX + block.width) * iws), int((block.posY + block.height) * ihs))
-                color = (255, 0, 0)
-
-                cv2.rectangle(blank_img, start_point, end_point, color, 2)
-                cv2.imshow("test", blank_img)
-                cv2.waitKey(1)
             block.recognize(img.copy())
 
     def show(self, img=None):

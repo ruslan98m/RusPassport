@@ -10,6 +10,7 @@ import numpy as np
 from pasportrecogniotion.util.docdescription import DocDescription
 from pasportrecogniotion.util.pipeline import Pipeline
 from pasportrecogniotion.text import MRZ
+from userInterface.passport_data import PassportData
 
 def show(img):
     cv2.imshow("test", img)
@@ -30,31 +31,22 @@ class OpenCVPreProc(object):
         return  self.rectKernel, self.sqKernel
 
 
-class Loader(object):
-    """Loads `file` to `img`."""
+
+class GrayConverter(object):
+    """Convert img to GRAY"""
 
     __depends__ = ['rectKernel']
     __provides__ = ['img', 'img_real']
 
-    def __init__(self, file, as_gray=True, pdf_aware=True):
-        self.file = file
-        self.as_gray = as_gray
-        self.pdf_aware = pdf_aware
-
-    def _imread(self, file, rectKernel):
-        img = image = cv2.imread(file)
-        if img is not None and len(img.shape) != 2:
-            # The PIL plugin somewhy fails to load some images
-
-            img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            gray = cv2.GaussianBlur(img, (3, 3), 0)
-            blackhat = cv2.morphologyEx(gray, cv2.MORPH_BLACKHAT, rectKernel)
-        return blackhat, img
+    def __init__(self, img):
+        self.img = img
 
     def __call__(self, rectKernel):
-        if isinstance(self.file, str):
-            return self._imread(self.file, rectKernel)
-        return None
+        img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+        gray = cv2.GaussianBlur(img, (3, 3), 0)
+        blackhat = cv2.morphologyEx(gray, cv2.MORPH_BLACKHAT, rectKernel)
+
+        return blackhat, img
 
 class BooneTransform(object):
     """Processes `img_small` according to Hans Boone's method
@@ -104,8 +96,8 @@ class MRZBoxLocator(object):
 class BoxToMRZ(object):
     """Convert text to MRZ"""
 
-    __provides__ = ['mrz']
     __depends__ = ['boxes']
+    __provides__ = ['mrz']
 
     def __call__(self, boxes):
         text = boxes['MRZ']
@@ -116,43 +108,49 @@ class BoxToMRZ(object):
             pass
         return mrz
 
+class BoxToData(object):
+
+    __depends__ = ['boxes']
+    __provides__ = ['data']
+
+    def __call__(self, boxes, mrz):
+
+        data = PassportData()
+
+        return data
 
 
 
 class MRZPipeline(Pipeline):
-    """This is the "currently best-performing" pipeline for parsing MRZ from a given image file."""
+    """This is the "currently best-performing" pipeline for parsing passport from a given image file."""
 
-    def __init__(self, file, docfile, extra_cmdline_params=''):
+    def __init__(self, img, docfile, extra_cmdline_params=''):
         super(MRZPipeline, self).__init__()
-        self.version = '1.0'  # In principle we might have different pipelines in use, so possible backward compatibility is an issue
-        self.file = file
+        self.version = '1.0'
         self.add_component('opencv', OpenCVPreProc())
-        self.add_component('loader', Loader(file))
-        self.add_component('scaler', Scaler())
+        self.add_component('loader', GrayConverter(img))
         self.add_component('boone', BooneTransform())
         self.add_component('box_locator', MRZBoxLocator(DocDescription(docfile)))
         self.add_component('box_to_mrz', BoxToMRZ())
+        self.add_component('box_to_mrz', BoxToData())
 
     @property
     def result(self):
-        return self['mrz']
+        return self['data']
 
 
-def read_mrz(file, doc_descr, save_roi=False, extra_cmdline_params=''):
+def recognise_doc(img, doc_descr):
     """The main interface function to this module, encapsulating the recognition pipeline.
        Given an image filename, runs MRZPipeline on it, returning the parsed MRZ object.
 
-    :param file: A filename or a stream to read the file data from.
-    :param save_roi: when this is True, the .aux['roi'] field will contain the Region of Interest where the MRZ was parsed from.
-    :param extra_cmdline_params:extra parameters to the ocr.py
+    :param img: A img  to read the file data from.
+    :param doc_descr: A file to read document description from.
     """
-    p = MRZPipeline(file, doc_descr, extra_cmdline_params)
+    p = MRZPipeline(img, doc_descr)
     mrz = p.result
 
     if mrz is not None:
         mrz.aux['text'] = p['text']
-        if save_roi:
-            mrz.aux['roi'] = p['roi']
     return mrz
 
 
