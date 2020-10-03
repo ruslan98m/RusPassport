@@ -9,3 +9,6 @@
 /venv*
 /_tmp
 Thumbs.db
+/passporeye
+/.idea
+/.vscode

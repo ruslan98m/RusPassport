@@ -9,7 +9,7 @@ License: MIT
 from pkg_resources import resource_filename
 import numpy as np
 from skimage.io import imread
-from passporteye.util.ocr import ocr
+from pasportrecogniotion.util.ocr import ocr
 
 
 # Smoke test for Tesseract OCR
