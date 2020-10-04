@@ -43,14 +43,14 @@ class DataBlock():
 
         if self.name != 'MRZ':
             res = ocr(ROI, 'rus')
-            self.data.append("".join(filter(lambda x: x in self.whitelist, res[0:-2])))
-            if __debug__:
-                print(self.data[-1])
+            self.data.append("".join(filter(lambda x: x in self.whitelist, res[0:-1])))
+
+
         else:
             res = ocreng(ROI, 'eng')
-            self.mrz.append("".join(filter(lambda x: x in self.whitelist, res[0:-2])))
-            if __debug__:
-                print(self.mrz[-1])
+            self.mrz.append("".join(filter(lambda x: x in self.whitelist, res[0:-1])))
+
+
 
 
 class DocDescription(object):
@@ -85,12 +85,17 @@ class DocDescription(object):
                         block.images.append(box)
             block.recognize(img.copy())
 
+
+
     def show(self, img=None):
+        # Function for debuging
+
         cv2.namedWindow(self.name, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(self.name, self.width + 10, self.height + 10)
         blank_image = cv2.resize(img, (self.width + 10, self.height + 10))
         cv2.rectangle(blank_image, (5, 5), (self.width + 5, self.height + 5), (0, 255, 0), 2)
-        for i in self.blocks:
+        for name in self.blocks:
+            i = self.blocks[name]
             start_point = (i.posX + 5, i.posY + 5)
             end_point = (i.posX + i.width + 5, i.posY + i.height + 5)
             color = (255, 0, 0)

@@ -4,63 +4,63 @@
   "width": 400,
   "blocks": {
     "Паспорт выдан": {
-      "height": 85,
+      "height": 75,
       "width": 350,
       "posX": 20,
       "posY": 40,
       "direction": "normal",
-      "whitelist": "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ. \n",
+      "whitelist": "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ.№ 1234567890\n",
       "type": "rus"
     },
     "Дата выдачи": {
-      "height": 30,
+      "height": 35,
       "width": 140,
-      "posX": 30,
-      "posY": 115,
+      "posX": 27,
+      "posY": 110,
       "direction": "normal",
       "whitelist": "0123456789.",
       "type": "num"
     },
     "Код подразделения": {
-      "height": 30,
+      "height": 35,
       "width": 180,
       "posX": 180,
-      "posY": 115,
+      "posY": 110,
       "direction": "normal",
-      "whitelist": "0123456789-",
+      "whitelist": "0123456789",
       "type": "num"
     },
     "Серия1": {
-      "height": 100,
-      "width": 50,
-      "posX": 350,
+      "height": 80,
+      "width": 40,
+      "posX": 360,
       "posY": 50,
       "direction": "right",
       "whitelist": "0123456789",
       "type": "num"
     },
     "Номер1": {
-      "height": 120,
-      "width": 50,
-      "posX": 350,
-      "posY": 140,
+      "height": 100,
+      "width": 40,
+      "posX": 360,
+      "posY": 130,
       "direction": "right",
       "whitelist": "0123456789",
       "type": "num"
     },
     "Серия2": {
-      "height": 100,
-      "width": 50,
-      "posX": 350,
-      "posY": 350,
+      "height": 80,
+      "width": 40,
+      "posX": 360,
+      "posY": 360,
       "direction": "right",
       "whitelist": "0123456789",
       "type": "num"
     },
     "Номер2": {
       "height": 80,
-      "width": 50,
-      "posX": 350,
+      "width": 40,
+      "posX": 360,
       "posY": 440,
       "direction": "right",
       "whitelist": "0123456789",
@@ -81,25 +81,25 @@
       "posX": 170,
       "posY": 325,
       "direction": "normal",
-      "whitelist": "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ.- ",
+      "whitelist": "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ.- \n",
       "type": "rus"
     },
     "Имя": {
       "height": 27,
       "width": 200,
       "posX": 170,
-      "posY": 375,
+      "posY": 370,
       "direction": "normal",
-      "whitelist": "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ.- ",
+      "whitelist": "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ.- \n",
       "type": "rus"
     },
     "Отчество": {
       "height": 27,
       "width": 200,
       "posX": 170,
-      "posY": 395,
+      "posY": 390,
       "direction": "normal",
-      "whitelist": "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ.- ",
+      "whitelist": "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ.- \n",
       "type": "rus"
     },
     "Дата рождения": {
@@ -112,12 +112,12 @@
       "type": "num"
     },
     "Место рождения": {
-      "height": 35,
-      "width": 180,
+      "height": 70,
+      "width": 200,
       "posX": 150,
-      "posY": 440,
+      "posY": 450,
       "direction": "normal",
-      "whitelist": "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ. ",
+      "whitelist": "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ. \n",
       "type": "rus"
     },
     "Пол": {

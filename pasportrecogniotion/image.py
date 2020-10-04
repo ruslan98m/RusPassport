@@ -1,16 +1,8 @@
-'''
-Image processing for passport data extraction.
-
-Author: Dziuba Alexandr
-License: MIT
-'''
-
 import cv2
 import numpy as np
 from pasportrecogniotion.util.docdescription import DocDescription
 from pasportrecogniotion.util.pipeline import Pipeline
-from pasportrecogniotion.text import MRZ
-from userInterface.passport_data import PassportData
+from datavalidation.passportdata import PassportData
 
 def show(img):
     cv2.imshow("test", img)
@@ -92,37 +84,52 @@ class MRZBoxLocator(object):
         return self.doc_description.blocks
 
 
-
-class BoxToMRZ(object):
-    """Convert text to MRZ"""
-
-    __depends__ = ['boxes']
-    __provides__ = ['mrz']
-
-    def __call__(self, boxes):
-        text = boxes['MRZ']
-        mrz = MRZ.from_ocr(text)
-        mrz.aux['method'] = 'direct'
-        # Now try improving the result via hacks
-        if not mrz.valid:
-            pass
-        return mrz
-
 class BoxToData(object):
 
     __depends__ = ['boxes']
     __provides__ = ['data']
 
-    def __call__(self, boxes, mrz):
+    def __call__(self, boxes):
 
         data = PassportData()
+
+        data.name = "".join(boxes["Имя"].data).replace("\n"," ").replace(".","")
+        data.lastName = "".join(boxes["Фамилия"].data).replace("\n"," ").replace(".","")
+        data.midName = "".join(boxes["Отчество"].data).replace("\n"," ").replace(".","")
+
+        data.serial = "".join(boxes["Серия1"].data)
+        if (len(data.serial)!=4):
+            data.serial = "".join(boxes["Серия2"].data)
+
+        data.number = "".join(boxes["Номер1"].data)
+        if (len(data.serial) != 6):
+            data.serial = "".join(boxes["Серия2"].data)
+
+
+        dateBirth = "".join(filter(lambda x: len(x.replace(".",""))>2,boxes["Дата рождения"].data))
+        if len(dateBirth)>=9:
+            data.dateBirth = dateBirth[0:10]
+
+        data.male = "".join(boxes["Пол"].data)
+
+        data.place = "".join(filter(lambda x: len(x.replace(".",""))>2,boxes["Место рождения"].data)).replace("\n", " ")
+
+        data.placeExtradition = "".join(filter(
+            lambda x : len(x.replace(" ","").replace(".","").replace("-",""))>3,
+                                               boxes["Паспорт выдан"].data)).replace("\n", " ")
+
+        data.dataExtradition = "".join(filter(lambda x: len(x.replace(".",""))>2,
+                                              boxes["Дата выдачи"].data))
+
+
+        data.code="".join(boxes["Код подразделения"].data).replace("\n", "")
 
         return data
 
 
 
 class MRZPipeline(Pipeline):
-    """This is the "currently best-performing" pipeline for parsing passport from a given image file."""
+    """This is the  pipeline for parsing passport' data from a given image file."""
 
     def __init__(self, img, docfile, extra_cmdline_params=''):
         super(MRZPipeline, self).__init__()
@@ -131,13 +138,11 @@ class MRZPipeline(Pipeline):
         self.add_component('loader', GrayConverter(img))
         self.add_component('boone', BooneTransform())
         self.add_component('box_locator', MRZBoxLocator(DocDescription(docfile)))
-        self.add_component('box_to_mrz', BoxToMRZ())
         self.add_component('box_to_mrz', BoxToData())
 
     @property
     def result(self):
         return self['data']
-
 
 def recognise_doc(img, doc_descr):
     """The main interface function to this module, encapsulating the recognition pipeline.
@@ -147,10 +152,9 @@ def recognise_doc(img, doc_descr):
     :param doc_descr: A file to read document description from.
     """
     p = MRZPipeline(img, doc_descr)
-    mrz = p.result
+    result = p.result
 
-    if mrz is not None:
-        mrz.aux['text'] = p['text']
-    return mrz
+
+    return result
 
 

@@ -30,6 +30,6 @@ setup(name='RusPasport',
       packages=find_packages(exclude=['tests']),
       include_package_data=True,
       zip_safe=False,
-      install_requires=['numpy','cv2', 'pytesseract >= 0.2.0'],
-      
+      install_requires=['numpy','cv2', 'PyQt5', 'pytesseract >= 0.2.0'],
+
      )

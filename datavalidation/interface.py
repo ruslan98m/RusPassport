@@ -9,12 +9,16 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QLabel, QApplication)
 from PyQt5.QtGui import QPixmap
 import cv2 
 import sys
 import json
 
-from passport_data import *
+from pasportrecogniotion.image import recognise_doc
+from .passportdata import PassportData
+from pkg_resources import resource_filename
+
 
 class DisplayImageWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -27,30 +31,33 @@ class DisplayImageWidget(QtWidgets.QWidget):
         
         self.image = cv2.imread('123.png')
         self.image = QtGui.QImage(self.image.data, self.image.shape[1], self.image.shape[0], QtGui.QImage.Format_RGB888)
-        self.image_frame.setPixmap(QtGui.QPixmap.fromImage(self.image))      
-        
+        self.image_frame.setPixmap(QtGui.QPixmap.fromImage(self.image))
+
+
+
 
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow, pasPicture):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1100, 560)
 
-        #self.verticalLayout = QtWidgets.QVBoxLayout(Form)
-        #self.verticalLayout.setObjectName("verticalLayout")
+        self.picture = pasPicture
 
-        ##Label as image code
-        #self.infoLabel = QtWidgets.QLabel()
-        #pixmap = QtGui.QPixmap("123.png")
-        #self.infoLabel.setPixmap(pixmap)
-        #self.infoLabel.resize(100, 100)
-        #print(QtGui.QImageReader.supportedImageFormats()) 
-        #self.verticalLayout.addWidget(self.infoLabel)
-        #
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.serEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.serEdit.setGeometry(QtCore.QRect(780, 30, 90, 20))
+
+        hbox = QtWidgets.QHBoxLayout(self.centralwidget)
+        pixmap = QtGui.QPixmap(pasPicture)
+        lbl = QtWidgets.QLabel(self.centralwidget)
+        lbl.setPixmap(pixmap)
+        hbox.addWidget(lbl)
+        self.centralwidget.setLayout(hbox)
+        lbl.move(50, 50)
+
+       
 
         #серия паспорта
         self.serEdit.setObjectName("serEdit")
@@ -203,6 +210,9 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+
+       
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Passport recognition"))
@@ -220,8 +230,16 @@ class Ui_MainWindow(object):
         self.codeLabel.setText(_translate("MainWindow", "Код подразделения"))
         self.maleLabel.setText(_translate("MainWindow", "Пол"))
 
+
+        ## test data
+        file = lambda fn: resource_filename('tests', 'data/%s' % fn)
+        self.data = recognise_doc(cv2.imread(self.picture), file("RusPass.json"))
+
+        #Здесь выводится текст
+        self.setEditValidData(self.data)
+
     def buttonOkClicked(self):
-        self.placeBirth = self.placeEdit.text()
+        
         self.male = self.maleEdit.text()
 
         #name
@@ -241,25 +259,24 @@ class Ui_MainWindow(object):
         self.date_1 = self.dateEdit_1.text()
         self.date_2 = self.dateEdit_2.text()
 
+       
         self.data = {
             "passport data": {            
-                "Имя": self.lastName,
-                "Фамилия": self.name,
+                "Имя": self.name,
+                "Фамилия": self.lastName,
                 "Отчество": self.midName,
                 "Пол": self.male,
                 "Серия": self.serial,
                 "Номер": self.number,  
                 "Дата получения": self.date_2,
                 "Дата рождения": self.dateBirth,
-                "Место получения": self.place,
-                "Место рождения": self.placeBirth,
+                "Место рождения": self.place,
                 "Кем выдан": self.date_1,
                 "Код подразделения": self.code
             }
         }
-        with open("passport_data_file.json", "w", encoding='utf-8') as write_file:
+        with open("result2.json", "w", encoding='utf-8') as write_file:
             json.dump(self.data, write_file, sort_keys=False, ensure_ascii=False, separators=(',', ': '))
-        print("ok")
 
         #clear
         self.placeEdit.clear()
@@ -268,25 +285,26 @@ class Ui_MainWindow(object):
         self.midNameEdit.clear()
         self.lastnameEdit.clear()
         self.dateBirthEdit.clear()
-        self.placeEdit.clear()
         self.codeEdit.clear()
         self.serEdit.clear()
         self.numEdit.clear()
         self.dateEdit_1.clear()
         self.dateEdit_2.clear()
 
-    def setEditData(self, data):
+    def setEditValidData(self, data):
 
-        self.placeEdit.setText(data.placeBirth)
+
+        self.placeEdit.setText(data.place)
         self.maleEdit.setText(data.male)
         self.nameEdit.setText(data.name)
         self.midNameEdit.setText(data.midName)
         self.lastnameEdit.setText(data.lastName)
         self.dateBirthEdit.setText(data.dateBirth)
-        self.placeEdit.setText(data.place)
-        self.codeEdit.setText(data.place)
-        self.serEdit.setText(data.place)
+        self.codeEdit.setText(data.code)
+        self.serEdit.setText(data.serial)
         self.numEdit.setText(data.number )
-        self.dateEdit_1.setText(data.date_1)
-        self.dateEdit_2.setText(data.date_2)
+        self.dateEdit_1.setText(data.placeExtradition)
+        self.dateEdit_2.setText(data.dataExtradition)
+
+    
     
